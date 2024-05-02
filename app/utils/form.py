@@ -3,7 +3,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from app.utils.bootstrap import BootStrapModelForm
-
+from app.utils.encrypt import md5
 
 
 class AdminModelForm(BootStrapModelForm):
@@ -23,20 +23,75 @@ class AdminModelForm(BootStrapModelForm):
 
     #
     def clean_password(self):
-        password = self.clean_data.get('password')
+        password = self.cleaned_data.get('password')
 
-        return 
+        return md5(password)
 
 
     # 钩子
     def clean_confirm_password(self):
         password = self.cleaned_data.get('password')
-        confirm_password = self.cleaned_data.get('confirm_password')
+        confirm_password = md5(self.cleaned_data.get('confirm_password'))
         if confirm_password != password:
             raise ValidationError('密码不一致！')
 
         # 写入form.cleaned_data.confirm_password
         return confirm_password
+
+    def clean_username(self):
+        # 获取当前的id
+        # self.instance.pk
+
+        txt_username = self.cleaned_data['username']
+
+        exists = models.Admin.objects.filter(username=txt_username).exists()
+        if exists:
+            raise ValidationError('用户名已经存在！')
+
+        return txt_username
+
+
+class EditAdminModelForm(BootStrapModelForm):
+    # 额外输入框,数据库中没有的
+    confirm_password = forms.CharField(
+        label='确认密码',
+        widget=forms.PasswordInput(render_value=True)  # 报错后也会保留原来的值。
+    )
+
+    class Meta:
+        model = models.Admin
+        fields = ['username', 'password', 'confirm_password']
+        widgets = {
+            'password': forms.PasswordInput(render_value=True)
+        }
+
+    #
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+
+        return md5(password)
+    def clean_confirm_password(self):
+        password = self.cleaned_data.get('password')
+        confirm_password = md5(self.cleaned_data.get('confirm_password'))
+        if confirm_password != password:
+            raise ValidationError('密码不一致！')
+
+        # 写入form.cleaned_data.confirm_password
+        return confirm_password
+
+    def clean_username(self):
+            # 获取当前的id
+           # self.instance.pk
+
+        txt_username = self.cleaned_data['username']
+
+        exists = models.Mobel.objects.exclude(id=self.instance.pk).filter(mobel=txt_username).exists()
+        if exists:
+            raise ValidationError('用户名已经存在！')
+
+
+
+        return txt_username
 
 class DepartmentModelForm(BootStrapModelForm):
     class Meta:
