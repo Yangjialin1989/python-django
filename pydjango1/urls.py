@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app.views import depart,user,mobel
+from app.views import depart,user,mobel,admin
 
 
 
@@ -39,4 +39,8 @@ urlpatterns = [
     path('mobel/add',mobel.mobel_add),
     path('mobel/<int:nid>/edit',mobel.mobel_edit),
     path('mobel/delete',mobel.mobel_delete),
+
+    # 管理员管理
+    path('admin/list',admin.admin_list),
+    path('admin/add',admin.admin_add)
 ]

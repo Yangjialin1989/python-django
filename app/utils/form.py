@@ -4,6 +4,40 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from app.utils.bootstrap import BootStrapModelForm
 
+
+
+class AdminModelForm(BootStrapModelForm):
+    # 额外输入框,数据库中没有的
+    confirm_password = forms.CharField(
+        label='确认密码',
+        widget=forms.PasswordInput(render_value=True)# 报错后也会保留原来的值。
+    )
+
+
+    class Meta:
+        model = models.Admin
+        fields = ['username','password','confirm_password']
+        widgets = {
+            'password':forms.PasswordInput(render_value=True)
+        }
+
+    #
+    def clean_password(self):
+        password = self.clean_data.get('password')
+
+        return 
+
+
+    # 钩子
+    def clean_confirm_password(self):
+        password = self.cleaned_data.get('password')
+        confirm_password = self.cleaned_data.get('confirm_password')
+        if confirm_password != password:
+            raise ValidationError('密码不一致！')
+
+        # 写入form.cleaned_data.confirm_password
+        return confirm_password
+
 class DepartmentModelForm(BootStrapModelForm):
     class Meta:
         model = models.Department

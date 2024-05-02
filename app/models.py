@@ -58,5 +58,8 @@ class Mobel(models.Model):
     )
     status = models.SmallIntegerField(verbose_name='状态', choices=status_choices,default=2)
 
-
-
+# 管理员表
+class Admin(models.Model):
+    id = models.BigAutoField(verbose_name='id', primary_key=True)
+    username = models.CharField(verbose_name='姓名',max_length=32)
+    password = models.CharField(verbose_name='密码',max_length=64)
