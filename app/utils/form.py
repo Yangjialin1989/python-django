@@ -3,6 +3,11 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from app.utils.bootstrap import BootStrapModelForm
+
+class DepartmentModelForm(BootStrapModelForm):
+    class Meta:
+        model = models.Department
+        fields = ['id','title']
 class UserModelForm(BootStrapModelForm):
     # 自定义错误信息
     name = forms.CharField(min_length=3,label='用户名')

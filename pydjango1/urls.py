@@ -16,27 +16,27 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app import views
+from app.views import depart,user,mobel
 
 
 
 
 urlpatterns = [
     #部门管理
-    path('depart/list',views.depart_list),
-    path('depart/add',views.depart_add),
-    path('depart/delete',views.depart_delete),
-    path('depart/<int:nid>/edit',views.depart_edit),
+    path('depart/list',depart.depart_list),
+    path('depart/add',depart.depart_add),
+    path('depart/delete',depart.depart_delete),
+    path('depart/<int:nid>/edit',depart.depart_edit),
 
     # 用户管理
-    path('user/list',views.user_list),
-    path('user/add',views.user_add),
-    path('user/<int:nid>/edit',views.user_edit),
-    path('user/delete',views.user_delete),
+    path('user/list',user.user_list),
+    path('user/add',user.user_add),
+    path('user/<int:nid>/edit',user.user_edit),
+    path('user/delete',user.user_delete),
 
     # 靓号管理
-    path('mobel/list',views.mobel_list),
-    path('mobel/add',views.mobel_add),
-    path('mobel/<int:nid>/edit',views.mobel_edit),
-    path('mobel/delete',views.mobel_delete),
+    path('mobel/list',mobel.mobel_list),
+    path('mobel/add',mobel.mobel_add),
+    path('mobel/<int:nid>/edit',mobel.mobel_edit),
+    path('mobel/delete',mobel.mobel_delete),
 ]
