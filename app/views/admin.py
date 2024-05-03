@@ -8,7 +8,7 @@ from django.utils.safestring import mark_safe # 标记join()方法的字符串�
 # 导入分页类
 from app.utils.pagination import Pagination
 # 导入表单类
-from app.utils.form import EditAdminModelForm,AdminModelForm,DepartmentModelForm,EditMobelForm,MobelForm,UserModelForm
+from app.utils.form import AdminResetModelForm,EditAdminModelForm,AdminModelForm,DepartmentModelForm,EditMobelForm,MobelForm,UserModelForm
 
 # 一、管理员管理
 def admin_list(request):
@@ -60,4 +60,39 @@ def admin_edit(request,nid):
         form.save()
         return redirect('/admin/list')
     return render(request,'change.html',{'form':form,'title':title})
+
+def admin_delete(request):
+    """删除部门"""
+    #1.获取id
+    nid = request.GET.get('nid')
+    #2.删除对应的数据
+    models.Admin.objects.filter(id=nid).delete()
+    #3.重定向
+    return redirect('/admin/list')
+
+def admin_reset(request,nid):
+    row_object = models.Admin.objects.filter(id=nid).first()
+    if not row_object:
+        return render(request, 'error.html', {'msg': '数据不存在'})
+    title = '重置密码- {}'.format(row_object.username)
+
+    if request.method == 'GET':
+        form = AdminResetModelForm()
+        context = {
+            'form': form,
+            'title': title
+        }
+        return render(request, 'change.html', context)
+
+    form = AdminResetModelForm(data=request.POST,instance=row_object)
+    if form.is_valid():
+        form.save()
+        return redirect('/admin/list')
+    return render(request,'change.html',{'form':form,'title':title})
+
+
+
+
+
+
 

@@ -2,8 +2,67 @@ from app import models
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from app.utils.bootstrap import BootStrapModelForm
+from app.utils.bootstrap import BootStrapModelForm,BootStrapForm
 from app.utils.encrypt import md5
+
+# 登录Form
+class LoginForm(BootStrapForm):
+    # 新建字段
+    username = forms.CharField(
+        label='用户名',
+        widget=forms.TextInput,
+        required=True
+    )
+    password = forms.CharField(
+        label='密码',
+        widget=forms.PasswordInput(render_value=True),
+        required=True
+    )
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        return md5(password)
+
+
+
+# 登录ModelForm
+class LoginModelForm(forms.ModelForm):
+    # 导入字段,去orm中获取
+    class Meta:
+        model = models.Admin
+        fields = ['username','password']
+
+
+class AdminResetModelForm(BootStrapModelForm):
+    confirm_password = forms.CharField(
+        label='确认密码',
+        widget=forms.PasswordInput(render_value=True)
+    )
+    class Meta:
+        model = models.Admin
+        fields = ['password','confirm_password']
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        md5_password = md5(password)
+        # 去数据库效验当前密码和新密码是否一致
+        # self.instance.pk 可以拿到当前id
+        exists = models.Admin.objects.filter(id=self.instance.pk,password=md5_password).exists()
+        if exists:
+            raise ValidationError('密码不能与上次的密码一致！')
+
+
+
+        return md5_password
+    def clean_confirm_password(self):
+        password = self.cleaned_data.get('password')
+        confirm_password = md5(self.cleaned_data.get('confirm_password'))
+        if confirm_password != password:
+            raise ValidationError('密码不一致！')
+
+        # 写入form.cleaned_data.confirm_password
+        return confirm_password
+
+
 
 
 class AdminModelForm(BootStrapModelForm):
@@ -17,8 +76,8 @@ class AdminModelForm(BootStrapModelForm):
     class Meta:
         model = models.Admin
         fields = ['username','password','confirm_password']
-        widgets = {
-            'password':forms.PasswordInput(render_value=True)
+        widgets = {#render_value=True,
+            'password':forms.PasswordInput(attrs={"aria-describedby":"basic-addon2"})
         }
 
     #
@@ -68,8 +127,11 @@ class EditAdminModelForm(BootStrapModelForm):
     #
     def clean_password(self):
         password = self.cleaned_data.get('password')
+        md5_password = md5(password)
+        # 数据库校验当前密码和新输入的密码是否一致
 
-        return md5(password)
+
+        return md5_password
     def clean_confirm_password(self):
         password = self.cleaned_data.get('password')
         confirm_password = md5(self.cleaned_data.get('confirm_password'))

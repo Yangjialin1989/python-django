@@ -83,7 +83,7 @@ def user_edit(request,nid):
         return redirect('/user/list')
 
 # 删除
-def user_delete(request):
+def user_delete(request,nid):
     """删除部门"""
     #1.获取id
     nid = request.GET.get('nid')
