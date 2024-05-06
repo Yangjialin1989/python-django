@@ -24,7 +24,8 @@
     </style>
 </head>
 <body>
-<div class="container">
+
+<span class="container">
     <form method='post' class="form-horizontal  account" novalidate>
       <h2>用户登录</h2>
       {% csrf_token %}
@@ -43,6 +44,31 @@
     </div>
   </div>
   <div class="form-group">
+    <label class="col-sm-3 control-label">
+      <span>验证码</span>
+<!--      <span id="ok" style="color:lightgreen;display:{{error}}" class="glyphicon glyphicon-ok-sign"></span>-->
+<!--      <span id="error" style="color:red;" class="glyphicon glyphicon-remove-sign"></span>-->
+    </label>
+
+
+    <div class="col-sm-5">
+
+      {{ form.code }}
+      <span style="color:red;">{{ form.code.errors.0 }}</span>
+    </div>
+    <div class="col-sm-2">
+      <img src="/image/code" id="image_code" alt="" >
+
+    </div>
+
+  </div>
+      <div style="height:20px;">
+        <span id="countdown" style="margin-left:80px;color:red;">
+
+        </span>
+      </div>
+
+  <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
       <div class="checkbox">
         <label>
@@ -58,6 +84,17 @@
   </div>
 </form>
 </div>
-
+<script>
+  var countdown = 60;
+  var countdownTimer = setInterval(function(){
+    if(countdown>0){
+      document.getElementById('countdown').innerText = '验证码还有'+countdown+'s过期！'
+      countdown -= 1;
+    }else{
+      clearInterval(countdownTimer)
+      document.getElementById('countdown').style.display='none'
+    }
+  },1000)
+</script>
 </body>
 </html>

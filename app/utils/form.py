@@ -5,6 +5,18 @@ from django.core.validators import RegexValidator
 from app.utils.bootstrap import BootStrapModelForm,BootStrapForm
 from app.utils.encrypt import md5
 
+
+class TaskModelForm(BootStrapModelForm):
+    class Meta:
+        model = models.Task
+        fields = '__all__'
+        # widgets 自定义插件
+        widgets = {
+            'detail':forms.TextInput
+        }
+
+
+
 # 登录Form
 class LoginForm(BootStrapForm):
     # 新建字段
@@ -18,6 +30,12 @@ class LoginForm(BootStrapForm):
         widget=forms.PasswordInput(render_value=True),
         required=True
     )
+    code = forms.CharField(
+        label='验证码',
+        widget=forms.TextInput,
+        required=True
+    )
+
     def clean_password(self):
         password = self.cleaned_data.get('password')
         return md5(password)

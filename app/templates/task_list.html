@@ -1,0 +1,162 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom:10px;">
+        <div class="row">
+            <div class="col-lg-6 col-xs-4">
+                <a href="/user/add" target="_blank" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus-sign"></span>
+                    新建用户
+                </a>
+            </div>
+
+            <div style="float:right" class="col-lg-4 col-xs-6">
+                <form method="get">
+                    <div class="input-group">
+                        <input type="text" placeholder="搜你所想" value="{{ search_data }}" name="q"
+                               class="form-control">
+                        <span class="input-group-btn">
+                        <button type="submit" class="btn btn-default">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                    </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+        <div class="panel panel-success">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list"></span> 任务
+            </div>
+
+            <!-- Table -->
+            <form id="addForm" novalidate>
+                  <div class="clearfix">
+                      {% for field in form %}
+                    <div class="col-xs-6">
+                        <div class="form-group" style="position:relative;">
+                            <label>{{ field.label }}</label>
+                           {{ field }}
+                            <span class="error-msg" style="color:red;position:absolute;"></span>
+                        </div>
+                    </div>
+                      {% endfor %}
+
+                  </div>
+
+            </form>
+            <div style="margin-top:10px;" class="col-xs-12">
+                <button id="btnAdd"  class="btn btn-primary">提交</button>
+            </div>
+
+
+
+
+        </div>
+            <div style="margin-top:50px;" class="panel panel-success">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-th-list"></span> 管理员列表
+            <span style="color:black;margin-left:50px;">总计：{{ total_count }} 条数据</span>
+        </div>
+
+
+        <!-- Table -->
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>标题</th>
+                <th>级别</th>
+                <th>负责人</th>
+                <th>操作</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for obj in queryset %}
+            <tr>
+
+                <td>{{ obj.id }}</td>
+                <td>{{ obj.title }}</td>
+                <td>{{ obj.get_level_display}}</td>
+                <td>{{ obj.user.username}} </td>
+                <td>
+                    <a class="btn btn-primary btn-xs" href="/admin/{{ obj.id }}/edit">编辑</a>
+                    <a class="btn btn-danger btn-xs" href="/admin/delete?nid={{ obj.id }}">删除</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+        <ul class='pagination'>
+    {{ page_string }}
+    </ul>
+    </div>
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+//    页面加载完事件
+
+    $(function(){
+        bindBtn1Event();
+
+    })
+
+    function bindBtn1Event(){
+        $('#btnAdd').click(function(){
+            //错误提示设置空
+            $('.error-msg').empty();
+
+            $.ajax({
+
+                 url: "/task/add/",
+                type: "post",
+
+                data: $('#addForm').serialize(),//取form的所有数据
+                //contentTpye:'application/x-www-form-urlencoded;charset=UTF-8',
+               dataTpye:'JSON',
+//                processData: false,
+//                ContentType: 'application/x-www-form-urlencoded;charset=utf-8',
+//
+                success: function(res){
+                    //console.log(typeof(res))
+                    //console.log(res)
+                    //console.log(res.status)
+                    if(res.status){
+                       console.log('添加成功');
+                    }else{
+                       //console.log(res.error)
+                       // console.log('111',res.errors);
+                        $.each(res.error,function(name,data){
+                            console.log(name,data)
+                            $('#id_'+name).next().text(data[0].message)
+                        })
+                    }
+                },
+                complete:function(){
+
+                },
+                async:true
+
+
+
+
+        });
+        })
+    }
+
+
+
+
+
+</script>
+{% endblock%}
+
